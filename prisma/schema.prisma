@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id  Int       @id @default(autoincrement())
+  mix TrackMix?
+}
+
+model TrackMix {
+  id            Int             @id @default(autoincrement())
+  trackSettings TrackSettings[]
+  user          User            @relation(fields: [userId], references: [id])
+  userId        Int             @unique
+  masterVolume  Float
+  busOneVolume  Float
+  busTwoVolume  Float
+}
+
+model TrackSettings {
+  trackMixId  Int
+  trackMix    Track      @relation(fields: [trackMixId], references: [id])
+  trackMixes  TrackMix[]
+  id          Int        @id @default(autoincrement())
+  trackVolume Float?
+  trackPan    Float?
+  trackEqHi   Float?
+  trackEqMid  Float?
+  trackEqLow  Float?
+}
+
+model Track {
+  id            Int             @id @default(autoincrement())
+  songId        String
+  song          Song            @relation(fields: [songId], references: [id])
+  name          String
+  path          String
+  volume        Float?          @default(0)
+  pan           Float?          @default(0)
+  busOne        Boolean?        @default(false)
+  trackSettings TrackSettings[]
+}
+
+model Song {
+  id       String  @id
+  title    String
+  slug     String
+  artist   String
+  year     String
+  studio   String
+  location String
+  bpm      Int
+  start    Int
+  end      Int
+  tracks   Track[]
+}
