@@ -14,6 +14,7 @@ function ChannelStrip({
   state,
   toggleBusOne,
   toggleBusTwo,
+  busOneActive,
 }) {
   const [isMuted, setIsMuted] = useState(track.mute);
   const [volume, setVolume] = useState(0);
@@ -23,6 +24,7 @@ function ChannelStrip({
   const [highEqLevel, setHighEqLevel] = useState(track.highEqLevel);
   const [midEqLevel, setMidEqLevel] = useState(track.midEqLevel);
   const [lowEqLevel, setLowEqLevel] = useState(track.lowEqLevel);
+  const [busOneSendAmount, setBusOneSendAmount] = useState();
 
   // THIS IS WHERE THE LOGARITHMIC SCALE IS SET
   function changeVolume(e) {
@@ -158,9 +160,30 @@ function ChannelStrip({
             step={0.01}
             skin={skin}
             track={track}
+            value={busOneActive ? busOneSendAmount : 0}
           />
         </div>
       </div>
+
+      <div className="solo-mute">
+        <input
+          id={`${index}busOne${track.path}`}
+          type="checkbox"
+          onChange={toggleBusOne}
+        />
+        <label className="label" htmlFor={`${index}busOne${track.path}`}>
+          1
+        </label>
+        <input
+          id={`${index}busTwo${track.path}`}
+          type="checkbox"
+          onChange={toggleBusTwo}
+        />
+        <label className="label" htmlFor={`${index}busTwo${track.path}`}>
+          2
+        </label>
+      </div>
+
       <div className="solo-mute">
         <input
           id={`solo${track.path}`}
@@ -179,24 +202,6 @@ function ChannelStrip({
         />
         <label className="label" htmlFor={`mute${track.path}`}>
           M
-        </label>
-      </div>
-      <div className="solo-mute">
-        <input
-          id={`${index}busOne${track.path}`}
-          type="checkbox"
-          onChange={toggleBusOne}
-        />
-        <label className="label" htmlFor={`${index}busOne${track.path}`}>
-          1
-        </label>
-        <input
-          id={`${index}busTwo${track.path}`}
-          type="checkbox"
-          onChange={toggleBusTwo}
-        />
-        <label className="label" htmlFor={`${index}busTwo${track.path}`}>
-          2
         </label>
       </div>
 

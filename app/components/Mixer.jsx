@@ -83,9 +83,8 @@ function Mixer({ song }) {
     busOneMeter.current = new Meter();
     busTwoMeter.current = new Meter();
 
-    busOneChannel.current = new Channel().toDestination();
+    busOneChannel.current = new Volume().toDestination();
     busTwoChannel.current = new Volume().toDestination();
-    // busOneChannel.current.receive("busOne");
 
     for (let i = 0; i < tracks.length; i++) {
       eqs.current = [...eqs.current, new EQ3()];
@@ -104,10 +103,6 @@ function Mixer({ song }) {
         .sync()
         .start()
     );
-
-    channels.current.forEach((channel) => {
-      channel.send("busOne");
-    });
 
     return () => {
       t.stop();
@@ -508,6 +503,8 @@ function Mixer({ song }) {
               state={state}
               toggleBusOne={toggleBusOne}
               toggleBusTwo={toggleBusTwo}
+              busOneActive={busOneActive}
+              busTwoActive={busTwoActive}
             />
           );
         })}
