@@ -1,4 +1,6 @@
 import { redirect } from "@remix-run/node";
+import { PrismaClient } from "@prisma/client";
+const db = new PrismaClient();
 
 export const action = async ({ request }) => {
   const form = await request.formData();
@@ -12,6 +14,26 @@ export const action = async ({ request }) => {
     case "changeVolume":
       const volume = form.get("volume");
       console.log("volume: ", volume);
+      await db.trackSettings.update({
+        where: {
+          id: 1,
+        },
+        data: {
+          trackVolume: parseFloat(volume),
+        },
+      });
+      break;
+    case "changeMasterVolume":
+      const masterVolume = form.get("masterVolume");
+      console.log("masterVolume: ", masterVolume);
+      await db.trackMix.update({
+        where: {
+          id: 1,
+        },
+        data: {
+          masterVolume: parseFloat(masterVolume),
+        },
+      });
       break;
 
     case "changePan":

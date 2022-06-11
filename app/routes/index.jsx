@@ -20,7 +20,6 @@ export default function Index() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSongId]);
 
-  // THIS IS WHERE THE LOGARITHMIC SCALE IS SET
   function changeVolume(e) {
     const value = parseFloat(e.target.value, 10);
 
@@ -33,11 +32,26 @@ export default function Index() {
     );
   }
 
+  function changeMasterVolume(e) {
+    const value = parseFloat(e.target.value, 10);
+
+    fetcher.submit(
+      {
+        actionName: "changeMasterVolume",
+        masterVolume: value,
+      },
+      { method: "post", action: "/actions", replace: true }
+    );
+  }
+
   return (
     <div>
       <h1>Welcome to Remix</h1>
       <fetcher.Form>
-        <input type="range" onChange={changeVolume} />
+        <input type="range" onBlur={changeVolume} />
+      </fetcher.Form>
+      <fetcher.Form>
+        <input type="range" onBlur={changeMasterVolume} />
       </fetcher.Form>
     </div>
   );
