@@ -1,8 +1,17 @@
-import type { ActionFunction } from "@remix-run/node";
+import type { ActionFunction, HeadersFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useActionData, Link, useSearchParams } from "@remix-run/react";
+import { useActionData, Link, Form } from "@remix-run/react";
+import { login, createUserSession, register } from "~/utils/session.server";
 
 import { db } from "~/utils/db.server";
+
+export let headers: HeadersFunction = () => {
+  return {
+    "Cache-Control": `public, max-age=${60 * 10}, s-maxage=${
+      60 * 60 * 24 * 30
+    }`,
+  };
+};
 
 function validateUsername(username: unknown) {
   if (typeof username !== "string" || username.length < 3) {
@@ -18,91 +27,77 @@ function validatePassword(password: unknown) {
 
 type ActionData = {
   formError?: string;
-  fieldErrors?: {
-    username: string | undefined;
-    password: string | undefined;
-  };
-  fields?: {
-    loginType: string;
-    username: string;
-    password: string;
-  };
+  fieldErrors?: { username: string | undefined; password: string | undefined };
+  fields?: { loginType: string; username: string; password: string };
 };
 
-const badRequest = (data: ActionData) => json(data, { status: 400 });
-
-export const action: ActionFunction = async ({ request }) => {
-  const form = await request.formData();
-  const loginType = form.get("loginType");
-  const username = form.get("username");
-  const password = form.get("password");
+export let action: ActionFunction = async ({
+  request,
+}): Promise<Response | ActionData> => {
+  let { loginType, username, password } = Object.fromEntries(
+    await request.formData()
+  );
   if (
     typeof loginType !== "string" ||
     typeof username !== "string" ||
     typeof password !== "string"
   ) {
-    return badRequest({
-      formError: `Form not submitted correctly.`,
-    });
+    return { formError: `Form not submitted correctly.` };
   }
 
-  const fields = { loginType, username, password };
-  const fieldErrors = {
+  let fields = { loginType, username, password };
+  let fieldErrors = {
     username: validateUsername(username),
     password: validatePassword(password),
   };
-  if (Object.values(fieldErrors).some(Boolean))
-    return badRequest({ fieldErrors, fields });
+  if (Object.values(fieldErrors).some(Boolean)) return { fieldErrors, fields };
 
   switch (loginType) {
     case "login": {
-      // login to get the user
-      // if there's no user, return the fields and a formError
-      // if there is a user, create their session and redirect to /
-      return badRequest({
-        fields,
-        formError: "Not implemented",
-      });
+      const user = await login({ username, password });
+      if (!user) {
+        return {
+          fields,
+          formError: `Username/Password combination is incorrect`,
+        };
+      }
+      return createUserSession(user.id, "/jokes");
     }
     case "register": {
-      const userExists = await db.user.findFirst({
-        where: { username },
-      });
+      let userExists = await db.user.findFirst({ where: { username } });
       if (userExists) {
-        return badRequest({
+        return {
           fields,
           formError: `User with username ${username} already exists`,
-        });
+        };
       }
-      // create the user
-      // create their session and redirect to /
-      return badRequest({
-        fields,
-        formError: "Not implemented",
-      });
+      const user = await register({ username, password });
+      if (!user) {
+        return {
+          fields,
+          formError: `Something went wrong trying to create a new user.`,
+        };
+      }
+      return createUserSession(user.id, "/jokes");
     }
     default: {
-      return badRequest({
-        fields,
-        formError: `Login type invalid`,
-      });
+      return { fields, formError: `Login type invalid` };
     }
   }
 };
 
 export default function Login() {
-  const actionData = useActionData<ActionData>();
-  const [searchParams] = useSearchParams();
+  const actionData = useActionData<ActionData | undefined>();
   return (
     <div className="container">
       <div className="content" data-light="">
         <h1>Login</h1>
-        <form method="post">
-          <input
-            type="hidden"
-            name="redirectTo"
-            value={searchParams.get("redirectTo") ?? undefined}
-          />
+        <Form
+          method="post"
+          aria-describedby={
+            actionData?.formError ? "form-error-message" : undefined
+          }
+        >
           <fieldset>
             <legend className="sr-only">Login or Register?</legend>
             <label>
@@ -135,7 +130,7 @@ export default function Login() {
               name="username"
               defaultValue={actionData?.fields?.username}
               aria-invalid={Boolean(actionData?.fieldErrors?.username)}
-              aria-errormessage={
+              aria-describedby={
                 actionData?.fieldErrors?.username ? "username-error" : undefined
               }
             />
@@ -156,10 +151,8 @@ export default function Login() {
               name="password"
               defaultValue={actionData?.fields?.password}
               type="password"
-              aria-invalid={
-                Boolean(actionData?.fieldErrors?.password) || undefined
-              }
-              aria-errormessage={
+              aria-invalid={Boolean(actionData?.fieldErrors?.password)}
+              aria-describedby={
                 actionData?.fieldErrors?.password ? "password-error" : undefined
               }
             />
@@ -183,14 +176,11 @@ export default function Login() {
           <button type="submit" className="button">
             Submit
           </button>
-        </form>
+        </Form>
       </div>
-      <div className="links">
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-        </ul>
+      <br />
+      <div>
+        <Link to="/">Back home</Link>
       </div>
     </div>
   );

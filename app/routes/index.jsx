@@ -1,4 +1,4 @@
-import { useFetcher } from "@remix-run/react";
+import { useFetcher, Link } from "@remix-run/react";
 import { useState, useEffect } from "react";
 
 export default function Index() {
@@ -46,13 +46,14 @@ export default function Index() {
 
   return (
     <div>
-      <h1>Welcome to Remix</h1>
+      <h1>Remixer</h1>
       <fetcher.Form>
         <input type="range" onBlur={changeVolume} />
       </fetcher.Form>
       <fetcher.Form>
         <input type="range" onBlur={changeMasterVolume} />
       </fetcher.Form>
+      <Link to="/login">Login</Link>
     </div>
   );
 }
