@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useFetcher } from "@remix-run/react";
 import { Knob } from "react-rotary-knob";
 import skin from "../../utils/skin";
 import VuMeter from "./VuMeter";
@@ -14,8 +15,8 @@ function ChannelStrip({
   state,
   toggleBusOne,
   toggleBusTwo,
-  busOneActive,
 }) {
+  const fetcher = useFetcher();
   const [isMuted, setIsMuted] = useState(track.mute);
   const [volume, setVolume] = useState(0);
   const preFader = meterVal;
@@ -24,7 +25,6 @@ function ChannelStrip({
   const [highEqLevel, setHighEqLevel] = useState(track.highEqLevel);
   const [midEqLevel, setMidEqLevel] = useState(track.midEqLevel);
   const [lowEqLevel, setLowEqLevel] = useState(track.lowEqLevel);
-  const [busOneSendAmount, setBusOneSendAmount] = useState();
 
   // THIS IS WHERE THE LOGARITHMIC SCALE IS SET
   function changeVolume(e) {
@@ -35,18 +35,42 @@ function ChannelStrip({
 
     setVolume(value);
     channel.set({ volume: scaledVol });
+    fetcher.submit(
+      {
+        actionName: "changeVolume",
+        id: index,
+        volume: value,
+      },
+      { method: "post", action: "/actions", replace: true }
+    );
   }
 
   // THIS IS WHERE PAN IS SET
   function changePan(e) {
     const pan = e.target.value;
     channel.set({ pan });
+    fetcher.submit(
+      {
+        actionName: "changePan",
+        track: JSON.stringify(track),
+        pan,
+      },
+      { method: "post", action: "/actions", replace: true }
+    );
   }
 
   // THIS IS WHERE SOLO IS SET
   function changeSolo(e) {
     const solo = e.target.checked;
     channel.set({ solo });
+    fetcher.submit(
+      {
+        actionName: "changeSolo",
+        track: JSON.stringify(track),
+        solo,
+      },
+      { method: "post", action: "/actions", replace: true }
+    );
   }
 
   // THIS IS WHERE MUTE IS SET
@@ -54,33 +78,56 @@ function ChannelStrip({
     const mute = e.target.checked;
     setIsMuted(mute);
     channel.set({ mute });
+    fetcher.submit(
+      {
+        actionName: "changeMute",
+        track: JSON.stringify(track),
+        mute,
+      },
+      { method: "post", action: "/actions", replace: true }
+    );
   }
 
   // THIS IS WHERE HIGH EQ IS SET
   function changeHighEqLevel(val) {
     eq.high.value = val;
-
     setHighEqLevel(val);
+    fetcher.submit(
+      {
+        actionName: "changeHighEqLevel",
+        track: JSON.stringify(track),
+        highEqLevel: val,
+      },
+      { method: "post", action: "/actions", replace: true }
+    );
   }
 
   // THIS IS WHERE MID EQ IS SET
   function changeMidEqLevel(val) {
     eq.mid.value = val;
-
     setMidEqLevel(val);
+    fetcher.submit(
+      {
+        actionName: "changeMidEqLevel",
+        track: JSON.stringify(track),
+        midEqLevel: val,
+      },
+      { method: "post", action: "/actions", replace: true }
+    );
   }
 
   // THIS IS WHERE LOW EQ IS SET
   function changeLowEqLevel(val) {
     eq.low.value = val;
-
     setLowEqLevel(val);
-  }
-
-  // THIS IS WHERE LOW EQ IS SET
-  function changeBusOneSendAmount(val) {
-    console.log("channel", channel);
-    channel.volume.value = val;
+    fetcher.submit(
+      {
+        actionName: "changeLowEqLevel",
+        track: JSON.stringify(track),
+        lowEqLevel: val,
+      },
+      { method: "post", action: "/actions", replace: true }
+    );
   }
 
   return (
@@ -142,25 +189,6 @@ function ChannelStrip({
             step={0.01}
             skin={skin}
             track={track}
-          />
-        </div>
-        <div className="pan-labels">Send</div>
-        <div id="low">
-          <input type="hidden" name="actionName" value="changeLowEqLevel" />
-          <Knob
-            onChange={changeBusOneSendAmount}
-            className="knob"
-            min={-8}
-            max={8}
-            preciseMode={true}
-            unlockDistance={0}
-            rotateDegrees={180}
-            clampMin={40}
-            clampMax={320}
-            step={0.01}
-            skin={skin}
-            track={track}
-            value={busOneActive ? busOneSendAmount : 0}
           />
         </div>
       </div>

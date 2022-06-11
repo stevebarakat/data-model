@@ -14,6 +14,7 @@ import {
   Transport as t,
   Destination,
   Volume,
+  Gain,
 } from "tone";
 import Controls from "./Transport/Controls";
 import Delay from "./FX/Delay";
@@ -83,8 +84,8 @@ function Mixer({ song }) {
     busOneMeter.current = new Meter();
     busTwoMeter.current = new Meter();
 
-    busOneChannel.current = new Volume().toDestination();
-    busTwoChannel.current = new Volume().toDestination();
+    busOneChannel.current = new Gain().toDestination();
+    busTwoChannel.current = new Gain().toDestination();
 
     for (let i = 0; i < tracks.length; i++) {
       eqs.current = [...eqs.current, new EQ3()];
@@ -99,7 +100,7 @@ function Mixer({ song }) {
     // connect everything
     players.current.forEach((player, i) =>
       player
-        .chain(eqs.current[i], channels.current[i], meters.current[i])
+        .chain(channels.current[i], eqs.current[i], meters.current[i])
         .sync()
         .start()
     );

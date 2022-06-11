@@ -15,7 +15,6 @@ async function seed() {
     data: {
       id: "borderline",
       title: "Borderline",
-      slug: "borderline",
       artist: "Madonna",
       year: "1983",
       studio: "Sigma Sound",

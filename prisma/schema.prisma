@@ -11,44 +11,47 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  username     String    @unique
+  id           String     @id @default(uuid())
+  username     String     @unique
   passwordHash String
-  mix          TrackMix?
+  mix          SongMix?
+  TrackMix     TrackMix[]
+}
+
+model SongMix {
+  id           Int        @id @default(autoincrement())
+  trackMix     TrackMix[]
+  userId       String     @unique
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  masterVolume Float
+  busOneVolume Float
+  busTwoVolume Float
 }
 
 model TrackMix {
-  id            Int             @id @default(autoincrement())
-  trackSettings TrackSettings[]
-  userId        String             @unique
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  masterVolume  Float
-  busOneVolume  Float
-  busTwoVolume  Float
-}
-
-model TrackSettings {
+  id          Int       @id @default(autoincrement())
+  songMix     Track     @relation(fields: [trackMixId], references: [id])
   trackMixId  Int
-  trackMix    Track      @relation(fields: [trackMixId], references: [id])
-  trackMixes  TrackMix[]
-  id          Int        @id @default(autoincrement())
-  trackVolume Float?     @default(0)
-  trackPan    Float?      @default(0)
-  trackEqHi   Float?      @default(0)
-  trackEqMid  Float?      @default(0)
-  trackEqLow  Float?      @default(0)
+  trackMixes  SongMix[]
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trackVolume Float?    @default(0)
+  trackPan    Float?    @default(0)
+  trackEqHi   Float?    @default(0)
+  trackEqMid  Float?    @default(0)
+  trackEqLow  Float?    @default(0)
 }
 
 model Track {
-  id            Int             @id @default(autoincrement())
-  songId        String
-  song          Song            @relation(fields: [songId], references: [id])
-  name          String
-  path          String
-  volume        Float?          @default(0)
-  pan           Float?          @default(0)
-  busOne        Boolean?        @default(false)
-  trackSettings TrackSettings[]
+  id       Int        @id @default(autoincrement())
+  songId   String
+  song     Song       @relation(fields: [songId], references: [id])
+  name     String
+  path     String
+  volume   Float?     @default(0)
+  pan      Float?     @default(0)
+  busOne   Boolean?   @default(false)
+  trackMix TrackMix[]
 }
 
 model Song {

@@ -15,7 +15,6 @@ async function seed() {
     data: {
       id: "roxanne",
       title: "Roxanne",
-      slug: "roxanne",
       artist: "The Police",
       year: "1978",
       studio: "Surry Sound",

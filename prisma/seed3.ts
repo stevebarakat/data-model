@@ -15,7 +15,6 @@ async function seed() {
     data: {
       id: "blue-monday",
       title: "BlueMonday",
-      slug: "blue-monday",
       artist: "New Order",
       year: "1986",
       studio: "Britannia Row",

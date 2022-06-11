@@ -15,7 +15,6 @@ async function seed() {
     data: {
       id: "a-day-in-the-life",
       title: "A Day In The Life",
-      slug: "a-day-in-the-life",
       artist: "The Beatles",
       year: "1967",
       studio: "Abby Road",

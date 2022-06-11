@@ -4,19 +4,17 @@ import { db } from "~/utils/db.server";
 export const action = async ({ request }) => {
   const form = await request.formData();
   const actionName = form.get("actionName");
-  const track = form.get("track");
-  const id = form.get("id");
-  const parsedTrack = JSON.parse(track);
-  console.log("parddsedTrack", parsedTrack);
-  console.log("actionName", actionName);
+  const id = parseInt(form.get("id"), 10);
+  const idPlusOne = parseInt(id + 1, 10);
+  console.log("I.D. --- :", idPlusOne);
 
   switch (actionName) {
     case "changeVolume":
       const volume = form.get("volume");
       console.log("volume: ", volume);
-      await db.trackSettings.update({
+      await db.trackMix.update({
         where: {
-          id: parseInt(id + 1, 10),
+          id: idPlusOne,
         },
         data: {
           trackVolume: parseFloat(volume),
