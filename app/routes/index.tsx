@@ -26,7 +26,7 @@ export default function Index() {
   const fetcher = useFetcher();
   const songQuery = fetcher.data;
   const [isLoaded, setIsLoaded] = useState(false);
-  const handleSetIsLoaded = (value) => setIsLoaded(value);
+  const handleSetIsLoaded = (value: boolean) => setIsLoaded(value);
   const [selectedSongId, setSelectedSongId] = useState("roxanne");
 
   songQuery !== undefined && console.log("songQuery", songQuery.song);

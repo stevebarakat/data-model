@@ -30,7 +30,7 @@ import Loader from "./Loader";
 import Chebyshever from "./FX/Chebyshev";
 import MultiMeter from "./Channels/MultiMeter";
 
-function Mixer({ song }) {
+function Mixer({ song, isLoaded, handleSetIsLoaded }) {
   const tracks = song.tracks;
   const requestRef = useRef();
   const channels = useRef([]);
@@ -46,7 +46,6 @@ function Mixer({ song }) {
   const [state, setState] = useState("stopped");
   const handleSetState = (value) => setState(value);
   const [meterVals, setMeterVals] = useState(new Float32Array());
-  const [isLoaded, setIsLoaded] = useState(false);
 
   const [busOneFxOneType, setBusOneFxOneType] = useState(null);
   const [busOneFxOneChoice, setBusOneFxOneChoice] = useState(null);
@@ -123,8 +122,8 @@ function Mixer({ song }) {
   }, [tracks]);
 
   useEffect(() => {
-    loaded().then(() => setIsLoaded(true));
-  }, [setIsLoaded]);
+    setTimeout(() => loaded().then(() => handleSetIsLoaded(true)), 250);
+  }, [handleSetIsLoaded]);
 
   // loop recursively to amimateMeters
   const animateMeter = useCallback(() => {
