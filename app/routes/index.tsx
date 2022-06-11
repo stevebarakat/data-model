@@ -25,6 +25,8 @@ export default function Index() {
   const data = useLoaderData<LoaderData>();
   const fetcher = useFetcher();
   const songQuery = fetcher.data;
+  const [isLoaded, setIsLoaded] = useState(false);
+  const handleSetIsLoaded = (value) => setIsLoaded(value);
   const [selectedSongId, setSelectedSongId] = useState("roxanne");
 
   songQuery !== undefined && console.log("songQuery", songQuery.song);
@@ -42,6 +44,7 @@ export default function Index() {
   }, [selectedSongId]);
 
   function changeSong(e) {
+    setIsLoaded(false);
     switch (e.target.value) {
       case "a-day-in-the-life":
         setSelectedSongId("a-day-in-the-life");
@@ -49,6 +52,10 @@ export default function Index() {
 
       case "roxanne":
         setSelectedSongId("roxanne");
+        break;
+
+      case "borderline":
+        setSelectedSongId("borderline");
         break;
 
       case "blue-monday":
@@ -59,10 +66,32 @@ export default function Index() {
         break;
     }
   }
-  console.log("data: ", data);
+
   return (
     <div>
-      {songQuery !== undefined && <Mixer song={songQuery.song} />}
+      {data.user ? (
+        <div className="user-info">
+          <span>{`Hi ${data.user.username}`}</span>
+          <form action="/logout" method="post">
+            <button type="submit" className="button">
+              Logout
+            </button>
+          </form>
+        </div>
+      ) : (
+        <div style={{ fontSize: "2rem", display: "flex", gap: "16px" }}>
+          <Link style={{ color: "white" }} to="/login">
+            Login
+          </Link>
+        </div>
+      )}
+      {songQuery !== undefined && (
+        <Mixer
+          song={songQuery.song}
+          isLoaded={isLoaded}
+          handleSetIsLoaded={handleSetIsLoaded}
+        />
+      )}
       <Form method="post" style={{ display: "flex", justifyContent: "center" }}>
         <select
           onChange={changeSong}
@@ -74,30 +103,11 @@ export default function Index() {
           <option value="a-day-in-the-life">
             The Beatles - A Day In The Life
           </option>
+          <option value="borderline">Madonna - Borderline</option>
           <option value="roxanne">The Police - Roxanne</option>
           <option value="blue-monday">New Order - Blue Monday</option>
         </select>
       </Form>
-      {data.user ? (
-        <div className="user-info">
-          <span>{`Hi ${data.user.username}`}</span>
-          <form action="/logout" method="post">
-            <button type="submit" className="button">
-              Logout
-            </button>
-          </form>
-        </div>
-      ) : (
-        <Link to="/login">Login</Link>
-      )}
-      <div style={{ fontSize: "2rem", display: "flex", gap: "16px" }}>
-        <Link style={{ color: "white" }} to="/login">
-          login
-        </Link>
-        <Link style={{ color: "white" }} to="/logout">
-          logout
-        </Link>
-      </div>
     </div>
   );
 }

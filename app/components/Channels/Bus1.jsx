@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import VuMeter from "./VuMeter";
-import { dBToPercent } from "~/utils/scale";
+import { dBToPercent } from "../../utils/scale";
 
 function Bus1({
   state,
@@ -13,8 +13,6 @@ function Bus1({
   const requestRef = useRef();
   const [masterMeterVal, setMasterMeterVal] = useState(-12);
   const [masterVol, setMasterVol] = useState(0);
-  const [busOneFxOneOpen, setBusOneFxOneOpen] = useState(false);
-  const [busOneFxTwoOpen, setBusOneFxTwoOpen] = useState(false);
   const busOneActiveBool = busOneActive.some((bus) => bus === true);
 
   if (busOneChannel !== null) {
@@ -45,22 +43,6 @@ function Bus1({
 
   return (
     <div>
-      <dialog open={busOneFxOneOpen}>
-        <div>
-          <button onClick={() => setBusOneFxOneOpen(false)}>X</button>
-          <div>
-            <input type="range" />
-          </div>
-        </div>
-      </dialog>
-      <dialog open={busOneFxTwoOpen}>
-        <div>
-          <button onClick={() => setBusOneFxOneOpen(false)}>X</button>
-          <div>
-            <input type="range" />
-          </div>
-        </div>
-      </dialog>
       {busOneActiveBool === true ? (
         <>
           <div style={{ display: "flex", flexDirection: "column" }}>
@@ -68,7 +50,7 @@ function Bus1({
               onChange={(e) => handleSetBusOneFxOneChoice(e.target.value)}
               className="effect-select"
             >
-              <option value="fx1">FX1</option>
+              <option value="bs1-fx1">FX1</option>
               <option value="reverb">Reverb</option>
               <option value="delay">Delay</option>
               <option value="chorus">Chorus</option>
@@ -82,7 +64,7 @@ function Bus1({
               onChange={(e) => handleSetBusOneFxTwoChoice(e.target.value)}
               className="effect-select"
             >
-              <option value="fx2">FX2</option>
+              <option value="bs1-fx2">FX2</option>
               <option value="reverb">Reverb</option>
               <option value="delay">Delay</option>
               <option value="chorus">Chorus</option>

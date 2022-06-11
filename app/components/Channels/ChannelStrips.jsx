@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useFetcher } from "@remix-run/react";
 import { Knob } from "react-rotary-knob";
-import skin from "~/utils/skin";
+import skin from "../../utils/skin";
 import VuMeter from "./VuMeter";
-import { scale } from "~/utils/scale";
+import { scale } from "../../utils/scale";
 
 function ChannelStrip({
   index,
@@ -14,10 +13,10 @@ function ChannelStrip({
   meterVal,
   state,
   toggleBusOne,
+  toggleBusTwo,
 }) {
-  const fetcher = useFetcher();
   const [isMuted, setIsMuted] = useState(track.mute);
-  const [volume, setVolume] = useState(track.volume);
+  const [volume, setVolume] = useState(0);
   const preFader = meterVal;
   const postFader = meterVal + volume;
   const [isPostFader, setIsPostFader] = useState(true);
@@ -28,49 +27,24 @@ function ChannelStrip({
   // THIS IS WHERE THE LOGARITHMIC SCALE IS SET
   function changeVolume(e) {
     if (isMuted) return;
-    const id = e.target.id;
     const value = parseFloat(e.target.value, 10);
     const vol = Math.log(value + 101) / Math.log(113);
     const scaledVol = scale(vol, 0, 1, -100, 12);
 
     setVolume(value);
     channel.set({ volume: scaledVol });
-    fetcher.submit(
-      {
-        actionName: "changeVolume",
-        id: id,
-        volume: value,
-      },
-      { method: "post", action: "/actions", replace: true }
-    );
   }
 
   // THIS IS WHERE PAN IS SET
   function changePan(e) {
     const pan = e.target.value;
     channel.set({ pan });
-    fetcher.submit(
-      {
-        actionName: "changePan",
-        track: JSON.stringify(track),
-        pan,
-      },
-      { method: "post", action: "/actions", replace: true }
-    );
   }
 
   // THIS IS WHERE SOLO IS SET
   function changeSolo(e) {
     const solo = e.target.checked;
     channel.set({ solo });
-    fetcher.submit(
-      {
-        actionName: "changeSolo",
-        track: JSON.stringify(track),
-        solo,
-      },
-      { method: "post", action: "/actions", replace: true }
-    );
   }
 
   // THIS IS WHERE MUTE IS SET
@@ -78,124 +52,113 @@ function ChannelStrip({
     const mute = e.target.checked;
     setIsMuted(mute);
     channel.set({ mute });
-    fetcher.submit(
-      {
-        actionName: "changeMute",
-        track: JSON.stringify(track),
-        mute,
-      },
-      { method: "post", action: "/actions", replace: true }
-    );
   }
 
   // THIS IS WHERE HIGH EQ IS SET
   function changeHighEqLevel(val) {
     eq.high.value = val;
-    fetcher.submit(
-      {
-        actionName: "changeHighEqLevel",
-        track: JSON.stringify(track),
-        highEqLevel: val,
-      },
-      { method: "post", action: "/actions", replace: true }
-    );
+
     setHighEqLevel(val);
   }
 
   // THIS IS WHERE MID EQ IS SET
   function changeMidEqLevel(val) {
     eq.mid.value = val;
-    fetcher.submit(
-      {
-        actionName: "changeMidEqLevel",
-        track: JSON.stringify(track),
-        midEqLevel: val,
-      },
-      { method: "post", action: "/actions", replace: true }
-    );
+
     setMidEqLevel(val);
   }
 
   // THIS IS WHERE LOW EQ IS SET
   function changeLowEqLevel(val) {
     eq.low.value = val;
-    fetcher.submit(
-      {
-        actionName: "changeLowEqLevel",
-        track: JSON.stringify(track),
-        lowEqLevel: val,
-      },
-      { method: "post", action: "/actions", replace: true }
-    );
+
     setLowEqLevel(val);
+  }
+
+  // THIS IS WHERE LOW EQ IS SET
+  function changeBusOneSendAmount(val) {
+    console.log("channel", channel);
+    channel.volume.value = val;
   }
 
   return (
     <div className="channel">
       <div className="fader-wrap">
-        <div className="fx-labels">EQ</div>
+        <div className="pan-labels">EQ</div>
         <div id="hi">
-          <fetcher.Form method="post" action="/actions">
-            <input type="hidden" name="actionName" value="changeHighEqLevel" />
-            <Knob
-              className="knob"
-              min={-8}
-              max={8}
-              preciseMode={true}
-              unlockDistance={0}
-              rotateDegrees={180}
-              clampMin={40}
-              clampMax={320}
-              defaultValue={track.highEqLevel}
-              value={highEqLevel}
-              onBlur={changeHighEqLevel}
-              step={0.01}
-              skin={skin}
-              track={track}
-            />
-          </fetcher.Form>
+          <input type="hidden" name="actionName" value="changeHighEqLevel" />
+          <Knob
+            className="knob"
+            min={-8}
+            max={8}
+            preciseMode={true}
+            unlockDistance={0}
+            rotateDegrees={180}
+            clampMin={40}
+            clampMax={320}
+            defaultValue={track.highEqLevel}
+            value={highEqLevel}
+            onChange={changeHighEqLevel}
+            step={0.01}
+            skin={skin}
+            track={track}
+          />
         </div>
         <div id="mid">
-          <fetcher.Form method="post" action="/actions">
-            <input type="hidden" name="actionName" value="changeMidEqLevel" />
-            <Knob
-              onBlur={changeMidEqLevel}
-              className="knob"
-              min={-8}
-              max={8}
-              preciseMode={true}
-              unlockDistance={0}
-              rotateDegrees={180}
-              clampMin={40}
-              clampMax={320}
-              defaultValue={track.midEqLevel}
-              value={midEqLevel}
-              step={0.01}
-              skin={skin}
-              track={track}
-            />
-          </fetcher.Form>
+          <input type="hidden" name="actionName" value="changeMidEqLevel" />
+          <Knob
+            onChange={changeMidEqLevel}
+            className="knob"
+            min={-8}
+            max={8}
+            preciseMode={true}
+            unlockDistance={0}
+            rotateDegrees={180}
+            clampMin={40}
+            clampMax={320}
+            defaultValue={track.midEqLevel}
+            value={midEqLevel}
+            step={0.01}
+            skin={skin}
+            track={track}
+          />
         </div>
         <div id="low">
-          <fetcher.Form method="post" action="/actions">
-            <input type="hidden" name="actionName" value="changeLowEqLevel" />
-            <Knob
-              onBlur={changeLowEqLevel}
-              className="knob"
-              min={-8}
-              max={8}
-              preciseMode={true}
-              unlockDistance={0}
-              rotateDegrees={180}
-              clampMin={40}
-              clampMax={320}
-              defaultValue={track.lowEqLevel}
-              value={lowEqLevel}
-              step={0.01}
-              skin={skin}
-              track={track}
-            />
-          </fetcher.Form>
+          <input type="hidden" name="actionName" value="changeLowEqLevel" />
+          <Knob
+            onChange={changeLowEqLevel}
+            className="knob"
+            min={-8}
+            max={8}
+            preciseMode={true}
+            unlockDistance={0}
+            rotateDegrees={180}
+            clampMin={40}
+            clampMax={320}
+            defaultValue={track.lowEqLevel}
+            value={lowEqLevel}
+            step={0.01}
+            skin={skin}
+            track={track}
+          />
+        </div>
+        <div className="pan-labels">Send</div>
+        <div id="low">
+          <input type="hidden" name="actionName" value="changeLowEqLevel" />
+          <Knob
+            onChange={changeBusOneSendAmount}
+            className="knob"
+            min={-8}
+            max={8}
+            preciseMode={true}
+            unlockDistance={0}
+            rotateDegrees={180}
+            clampMin={40}
+            clampMax={320}
+            step={0.01}
+            skin={skin}
+            track={track}
+          />
         </div>
       </div>
       <div className="solo-mute">
@@ -203,7 +166,7 @@ function ChannelStrip({
           id={`solo${track.path}`}
           type="checkbox"
           defaultChecked={track.solo}
-          onBlur={changeSolo}
+          onChange={changeSolo}
         />
         <label className="label" htmlFor={`solo${track.path}`}>
           S
@@ -212,22 +175,28 @@ function ChannelStrip({
           id={`mute${track.path}`}
           type="checkbox"
           defaultChecked={track.mute}
-          onBlur={changeMute}
+          onChange={changeMute}
         />
         <label className="label" htmlFor={`mute${track.path}`}>
           M
         </label>
       </div>
-      <div className="bus">
+      <div className="solo-mute">
         <input
           id={`${index}busOne${track.path}`}
           type="checkbox"
-          // onBlur={toggleBusOne}
-          // checked={track.busOne}
-          onBlur={toggleBusOne}
+          onChange={toggleBusOne}
         />
         <label className="label" htmlFor={`${index}busOne${track.path}`}>
-          Bus 1
+          1
+        </label>
+        <input
+          id={`${index}busTwo${track.path}`}
+          type="checkbox"
+          onChange={toggleBusTwo}
+        />
+        <label className="label" htmlFor={`${index}busTwo${track.path}`}>
+          2
         </label>
       </div>
 
@@ -235,7 +204,7 @@ function ChannelStrip({
         <input
           id={`postFader${track.path}`}
           type="checkbox"
-          onBlur={(e) => {
+          onChange={(e) => {
             setIsPostFader(!e.target.checked);
           }}
         />
@@ -254,7 +223,7 @@ function ChannelStrip({
             min={-1}
             max={1}
             step={0.001}
-            onBlur={changePan}
+            onChange={changePan}
           />
           <div className="pan-labels">
             <span>L</span>
@@ -278,14 +247,14 @@ function ChannelStrip({
         </div>
         <div className="vol-wrap">
           <input
-            id={index + 1}
+            id={track.id}
             className="volume"
             type="range"
             min={-100}
             max={12}
             step={0.01}
             defaultValue={volume}
-            onBlur={changeVolume}
+            onChange={changeVolume}
           />
         </div>
         <div className="track-labels">

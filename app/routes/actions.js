@@ -16,7 +16,7 @@ export const action = async ({ request }) => {
       console.log("volume: ", volume);
       await db.trackSettings.update({
         where: {
-          id: parseInt(id, 10),
+          id: parseInt(id + 1, 10),
         },
         data: {
           trackVolume: parseFloat(volume),
