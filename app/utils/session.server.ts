@@ -30,7 +30,7 @@ if (!sessionSecret) {
 
 let { getSession, commitSession, destroySession } = createCookieSessionStorage({
   cookie: {
-    name: "RJ_session",
+    name: "Remixer_session",
     secure: true,
     secrets: [sessionSecret],
     sameSite: "lax",
@@ -60,7 +60,7 @@ export async function requireUserId(request: Request) {
 
 export async function getUser(request: Request) {
   let userId = await getUserId(request);
-  if (typeof userId !== "string") return null;
+  if (typeof userId !== "number") return null;
 
   try {
     let user = await db.user.findUnique({ where: { id: userId } });

@@ -1,5 +1,6 @@
-import { useFetcher, Link } from "@remix-run/react";
 import { useState, useEffect } from "react";
+import { Form, useFetcher } from "@remix-run/react";
+import Mixer from "~/components/Mixer";
 
 export default function Index() {
   const fetcher = useFetcher();
@@ -20,40 +21,42 @@ export default function Index() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSongId]);
 
-  function changeVolume(e) {
-    const value = parseFloat(e.target.value, 10);
+  function changeSong(e) {
+    switch (e.target.value) {
+      case "a-day-in-the-life":
+        setSelectedSongId("a-day-in-the-life");
+        break;
 
-    fetcher.submit(
-      {
-        actionName: "changeVolume",
-        volume: value,
-      },
-      { method: "post", action: "/actions", replace: true }
-    );
+      case "roxanne":
+        setSelectedSongId("roxanne");
+        break;
+
+      case "blue-monday":
+        setSelectedSongId("blue-monday");
+        break;
+
+      default:
+        break;
+    }
   }
-
-  function changeMasterVolume(e) {
-    const value = parseFloat(e.target.value, 10);
-
-    fetcher.submit(
-      {
-        actionName: "changeMasterVolume",
-        masterVolume: value,
-      },
-      { method: "post", action: "/actions", replace: true }
-    );
-  }
-
   return (
     <div>
-      <h1>Remixer</h1>
-      <fetcher.Form>
-        <input type="range" onBlur={changeVolume} />
-      </fetcher.Form>
-      <fetcher.Form>
-        <input type="range" onBlur={changeMasterVolume} />
-      </fetcher.Form>
-      <Link to="/login">Login</Link>
+      {songQuery !== undefined && <Mixer song={songQuery.song} />}
+      <Form method="post" style={{ display: "flex", justifyContent: "center" }}>
+        <select
+          onChange={changeSong}
+          className="song-select"
+          name="slug"
+          id="song-select"
+        >
+          <option value="">Choose A Song...</option>
+          <option value="a-day-in-the-life">
+            The Beatles - A Day In The Life
+          </option>
+          <option value="roxanne">The Police - Roxanne</option>
+          <option value="blue-monday">New Order - Blue Monday</option>
+        </select>
+      </Form>
     </div>
   );
 }

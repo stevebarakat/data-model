@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
+  id           String   @id @default(uuid())
   username     String    @unique
   passwordHash String
   mix          TrackMix?
@@ -20,7 +20,7 @@ model User {
 model TrackMix {
   id            Int             @id @default(autoincrement())
   trackSettings TrackSettings[]
-  userId        Int             @unique
+  userId        String             @unique
   user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   masterVolume  Float
   busOneVolume  Float
@@ -54,12 +54,11 @@ model Track {
 model Song {
   id       String  @id
   title    String
-  slug     String
   artist   String
   year     String
   studio   String
   location String
-  bpm      Int
+  bpm      Int?
   start    Int
   end      Int
   tracks   Track[]
