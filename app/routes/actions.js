@@ -1,6 +1,5 @@
 import { redirect } from "@remix-run/node";
-import { PrismaClient } from "@prisma/client";
-const db = new PrismaClient();
+import { db } from "~/utils/db.server";
 
 export const action = async ({ request }) => {
   const form = await request.formData();

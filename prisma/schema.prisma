@@ -11,15 +11,17 @@ datasource db {
 }
 
 model User {
-  id  Int       @id @default(autoincrement())
-  mix TrackMix?
+  id           Int       @id @default(autoincrement())
+  username     String    @unique
+  passwordHash String
+  mix          TrackMix?
 }
 
 model TrackMix {
   id            Int             @id @default(autoincrement())
   trackSettings TrackSettings[]
-  user          User            @relation(fields: [userId], references: [id])
   userId        Int             @unique
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   masterVolume  Float
   busOneVolume  Float
   busTwoVolume  Float
@@ -30,11 +32,11 @@ model TrackSettings {
   trackMix    Track      @relation(fields: [trackMixId], references: [id])
   trackMixes  TrackMix[]
   id          Int        @id @default(autoincrement())
-  trackVolume Float?
-  trackPan    Float?
-  trackEqHi   Float?
-  trackEqMid  Float?
-  trackEqLow  Float?
+  trackVolume Float?     @default(0)
+  trackPan    Float?      @default(0)
+  trackEqHi   Float?      @default(0)
+  trackEqMid  Float?      @default(0)
+  trackEqLow  Float?      @default(0)
 }
 
 model Track {

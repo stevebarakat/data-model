@@ -1,6 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { json } from "@remix-run/node";
-const db = new PrismaClient();
+import { db } from "~/utils/db.server";
 
 export const loader = async ({ params: { id } }) => {
   const song = await db.song.findUnique({
