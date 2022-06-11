@@ -1,5 +1,4 @@
 export default function Chebyshever({ controls }) {
-  // console.log("controls", controls);
   return (
     <div>
       <div style={{ display: "flex", flexDirection: "column" }}>

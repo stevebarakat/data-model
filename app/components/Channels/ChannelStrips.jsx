@@ -28,6 +28,7 @@ function ChannelStrip({
   // THIS IS WHERE THE LOGARITHMIC SCALE IS SET
   function changeVolume(e) {
     if (isMuted) return;
+    const id = e.target.id;
     const value = parseFloat(e.target.value, 10);
     const vol = Math.log(value + 101) / Math.log(113);
     const scaledVol = scale(vol, 0, 1, -100, 12);
@@ -37,7 +38,7 @@ function ChannelStrip({
     fetcher.submit(
       {
         actionName: "changeVolume",
-        track: JSON.stringify(track),
+        id: id,
         volume: value,
       },
       { method: "post", action: "/actions", replace: true }
@@ -147,7 +148,7 @@ function ChannelStrip({
               clampMax={320}
               defaultValue={track.highEqLevel}
               value={highEqLevel}
-              onChange={changeHighEqLevel}
+              onBlur={changeHighEqLevel}
               step={0.01}
               skin={skin}
               track={track}
@@ -158,7 +159,7 @@ function ChannelStrip({
           <fetcher.Form method="post" action="/actions">
             <input type="hidden" name="actionName" value="changeMidEqLevel" />
             <Knob
-              onChange={changeMidEqLevel}
+              onBlur={changeMidEqLevel}
               className="knob"
               min={-8}
               max={8}
@@ -179,7 +180,7 @@ function ChannelStrip({
           <fetcher.Form method="post" action="/actions">
             <input type="hidden" name="actionName" value="changeLowEqLevel" />
             <Knob
-              onChange={changeLowEqLevel}
+              onBlur={changeLowEqLevel}
               className="knob"
               min={-8}
               max={8}
@@ -202,7 +203,7 @@ function ChannelStrip({
           id={`solo${track.path}`}
           type="checkbox"
           defaultChecked={track.solo}
-          onChange={changeSolo}
+          onBlur={changeSolo}
         />
         <label className="label" htmlFor={`solo${track.path}`}>
           S
@@ -211,7 +212,7 @@ function ChannelStrip({
           id={`mute${track.path}`}
           type="checkbox"
           defaultChecked={track.mute}
-          onChange={changeMute}
+          onBlur={changeMute}
         />
         <label className="label" htmlFor={`mute${track.path}`}>
           M
@@ -221,9 +222,9 @@ function ChannelStrip({
         <input
           id={`${index}busOne${track.path}`}
           type="checkbox"
-          // onChange={toggleBusOne}
+          // onBlur={toggleBusOne}
           // checked={track.busOne}
-          onChange={toggleBusOne}
+          onBlur={toggleBusOne}
         />
         <label className="label" htmlFor={`${index}busOne${track.path}`}>
           Bus 1
@@ -234,7 +235,7 @@ function ChannelStrip({
         <input
           id={`postFader${track.path}`}
           type="checkbox"
-          onChange={(e) => {
+          onBlur={(e) => {
             setIsPostFader(!e.target.checked);
           }}
         />
@@ -253,7 +254,7 @@ function ChannelStrip({
             min={-1}
             max={1}
             step={0.001}
-            onChange={changePan}
+            onBlur={changePan}
           />
           <div className="pan-labels">
             <span>L</span>
@@ -277,14 +278,14 @@ function ChannelStrip({
         </div>
         <div className="vol-wrap">
           <input
-            id={track.id}
+            id={index + 1}
             className="volume"
             type="range"
             min={-100}
             max={12}
             step={0.01}
             defaultValue={volume}
-            onChange={changeVolume}
+            onBlur={changeVolume}
           />
         </div>
         <div className="track-labels">

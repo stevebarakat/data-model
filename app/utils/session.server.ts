@@ -60,7 +60,7 @@ export async function requireUserId(request: Request) {
 
 export async function getUser(request: Request) {
   let userId = await getUserId(request);
-  if (typeof userId !== "number") return null;
+  if (typeof userId !== "string") return null;
 
   try {
     let user = await db.user.findUnique({ where: { id: userId } });

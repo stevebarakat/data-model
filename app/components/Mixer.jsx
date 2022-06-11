@@ -269,7 +269,6 @@ function Mixer({ song }) {
   }, [busOneFxOneChoice, busOneFxOneType, busOneFxTwoChoice, busOneFxTwoType]);
 
   useEffect(() => {
-    console.log(busOneFxOneChoice);
     if (busOneFxOneChoice === "fx1") busOneFxOneType.disconnect();
     if (busOneFxOneType === null || busOneChannel.current === null) return;
     busOneChannel.current.connect(busOneFxOneType);

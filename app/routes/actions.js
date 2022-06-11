@@ -5,8 +5,9 @@ export const action = async ({ request }) => {
   const form = await request.formData();
   const actionName = form.get("actionName");
   const track = form.get("track");
+  const id = form.get("id");
   const parsedTrack = JSON.parse(track);
-  console.log("parsedTrack", parsedTrack);
+  console.log("parddsedTrack", parsedTrack);
   console.log("actionName", actionName);
 
   switch (actionName) {
@@ -15,7 +16,7 @@ export const action = async ({ request }) => {
       console.log("volume: ", volume);
       await db.trackSettings.update({
         where: {
-          id: 1,
+          id: parseInt(id, 10),
         },
         data: {
           trackVolume: parseFloat(volume),
