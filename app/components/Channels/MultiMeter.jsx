@@ -1,15 +1,12 @@
 import { useRef, useEffect, useState, useCallback } from "react";
-import { Destination, Analyser } from "tone";
-import { GainToAudio } from "tone";
+import { Destination, Analyser, GainToAudio } from "tone";
 import VuMeter from "./VuMeter";
 
 function MultiMeter({ state }) {
-  const [masterMeterVal, setMasterMeterVal] = useState(new Float32Array());
+  const [multiMeterVal, setMultiMeterVal] = useState(new Float32Array());
   const analyser = useRef();
   const requestRef = useRef();
   const gainToAudio = useRef();
-
-  // console.log("masterMeterVal", masterMeterVal);
 
   useEffect(() => {
     gainToAudio.current = new GainToAudio();
@@ -19,7 +16,7 @@ function MultiMeter({ state }) {
   }, []);
 
   const animateMeter = useCallback(() => {
-    setMasterMeterVal(analyser.current.getValue());
+    setMultiMeterVal(analyser.current.getValue());
     requestRef.current = requestAnimationFrame(animateMeter);
   }, [analyser]);
 
@@ -31,7 +28,7 @@ function MultiMeter({ state }) {
   }, [state]);
 
   let float32 = [];
-  masterMeterVal.map((val) => {
+  multiMeterVal.map((val) => {
     return (float32 = [...float32, Math.abs(val)]);
   });
   const multiMeters = float32.map((val, i) => (

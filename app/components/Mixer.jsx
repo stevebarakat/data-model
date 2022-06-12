@@ -87,13 +87,13 @@ function Mixer({ song, isLoaded, handleSetIsLoaded }) {
     busTwoChannel.current = new Gain().toDestination();
 
     for (let i = 0; i < tracks.length; i++) {
+      players.current = [...players.current, new Player(tracks[i].path)];
       eqs.current = [...eqs.current, new EQ3()];
       meters.current = [...meters.current, new Meter()];
       channels.current = [
         ...channels.current,
         new Channel(tracks[i].volume, tracks[i].pan).connect(Destination),
       ];
-      players.current = [...players.current, new Player(tracks[i].path)];
     }
 
     // connect everything
