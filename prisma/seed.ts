@@ -25,28 +25,28 @@ async function seed() {
     },
   });
 
-  const track1 = await db.track.create({
+  await db.track.create({
     data: {
       songId: song.id,
       name: "Drums",
       path: "https://ioxpcmpvgermtfqxwykx.supabase.co/storage/v1/object/public/songs/roxanne/Roxanne_Drums.mp3",
     },
   });
-  const track2 = await db.track.create({
+  await db.track.create({
     data: {
       songId: song.id,
       name: "Bass",
       path: "https://ioxpcmpvgermtfqxwykx.supabase.co/storage/v1/object/public/songs/roxanne/Roxanne_Bass.mp3",
     },
   });
-  const track3 = await db.track.create({
+  await db.track.create({
     data: {
       songId: song.id,
       name: "Guitar",
       path: "https://ioxpcmpvgermtfqxwykx.supabase.co/storage/v1/object/public/songs/roxanne/Roxanne_Guitar.mp3",
     },
   });
-  const track4 = await db.track.create({
+  await db.track.create({
     data: {
       songId: song.id,
       name: "Vocals",
@@ -54,6 +54,7 @@ async function seed() {
     },
   });
 }
+
 seed()
   .catch((e) => {
     console.error(e);

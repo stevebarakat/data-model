@@ -11,16 +11,15 @@ datasource db {
 }
 
 model User {
-  id           String     @id @default(uuid())
-  username     String     @unique
+  id           String    @id @default(uuid())
+  username     String    @unique
   passwordHash String
-  mix          SongMix?
-  TrackMix     TrackMix[]
+  mix          SongMix[]
 }
 
 model SongMix {
   id           Int        @id @default(autoincrement())
-  trackMix     TrackMix[]
+  trackMixes   TrackMix[]
   userId       String     @unique
   user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   masterVolume Float
@@ -29,29 +28,15 @@ model SongMix {
 }
 
 model TrackMix {
-  id          Int       @id @default(autoincrement())
-  songMix     Track     @relation(fields: [trackMixId], references: [id])
-  trackMixId  Int
-  trackMixes  SongMix[]
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  trackVolume Float?    @default(0)
-  trackPan    Float?    @default(0)
-  trackEqHi   Float?    @default(0)
-  trackEqMid  Float?    @default(0)
-  trackEqLow  Float?    @default(0)
-}
-
-model Track {
-  id       Int        @id @default(autoincrement())
-  songId   String
-  song     Song       @relation(fields: [songId], references: [id])
-  name     String
-  path     String
-  volume   Float?     @default(0)
-  pan      Float?     @default(0)
-  busOne   Boolean?   @default(false)
-  trackMix TrackMix[]
+  id          Int     @id @default(autoincrement())
+  songMix     Track   @relation(fields: [songMixId], references: [id])
+  songMixId   Int
+  trackVolume Float?  @default(0)
+  trackPan    Float?  @default(0)
+  trackEqHi   Float?  @default(0)
+  trackEqMid  Float?  @default(0)
+  trackEqLow  Float?  @default(0)
+  SongMix     SongMix @relation(fields: [songMixId], references: [id])
 }
 
 model Song {
@@ -65,4 +50,16 @@ model Song {
   start    Int
   end      Int
   tracks   Track[]
+}
+
+model Track {
+  id       Int        @id @default(autoincrement())
+  songId   String
+  song     Song       @relation(fields: [songId], references: [id])
+  name     String
+  path     String
+  volume   Float?     @default(0)
+  pan      Float?     @default(0)
+  busOne   Boolean?   @default(false)
+  trackMix TrackMix[]
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useFetcher } from "@remix-run/react";
 import { Knob } from "react-rotary-knob";
 import skin from "../../utils/skin";
@@ -25,6 +25,8 @@ function ChannelStrip({
   const [highEqLevel, setHighEqLevel] = useState(track.highEqLevel);
   const [midEqLevel, setMidEqLevel] = useState(track.midEqLevel);
   const [lowEqLevel, setLowEqLevel] = useState(track.lowEqLevel);
+
+  console.log("hello");
 
   // THIS IS WHERE THE LOGARITHMIC SCALE IS SET
   function changeVolume(e) {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   loaded,
   Player,
@@ -14,7 +14,6 @@ import {
   Transport as t,
   Destination,
   Volume,
-  Gain,
 } from "tone";
 import Controls from "./Transport/Controls";
 import Delay from "./FX/Delay";
@@ -28,7 +27,6 @@ import Bus2 from "./Channels/Bus2";
 import ChannelStrip from "./Channels/ChannelStrips";
 import Loader from "./Loader";
 import Chebyshever from "./FX/Chebyshev";
-import MultiMeter from "./Channels/MultiMeter";
 
 function Mixer({ song, isLoaded, handleSetIsLoaded }) {
   const tracks = song.tracks;
@@ -43,8 +41,8 @@ function Mixer({ song, isLoaded, handleSetIsLoaded }) {
   const busOneChannel = useRef(null);
   const busTwoMeter = useRef(null);
   const busTwoChannel = useRef(null);
-  const [state, setState] = useState("stopped");
-  const handleSetState = (value) => setState(value);
+  const [playState, setPlayState] = useState("stopped");
+  const handleSetState = (value) => setPlayState(value);
   const [meterVals, setMeterVals] = useState(new Float32Array());
 
   const [busOneFxOneType, setBusOneFxOneType] = useState(null);
@@ -71,7 +69,7 @@ function Mixer({ song, isLoaded, handleSetIsLoaded }) {
   if (t.seconds > song.end) {
     t.seconds = song.end;
     t.stop();
-    setState("stopped");
+    setPlayState("stopped");
   }
   // make sure song doesn't rewind past start position
   if (t.seconds < 0) {
@@ -83,8 +81,8 @@ function Mixer({ song, isLoaded, handleSetIsLoaded }) {
     busOneMeter.current = new Meter();
     busTwoMeter.current = new Meter();
 
-    busOneChannel.current = new Gain().toDestination();
-    busTwoChannel.current = new Gain().toDestination();
+    busOneChannel.current = new Volume().toDestination();
+    busTwoChannel.current = new Volume().toDestination();
 
     for (let i = 0; i < tracks.length; i++) {
       players.current = [...players.current, new Player(tracks[i].path)];
@@ -126,20 +124,20 @@ function Mixer({ song, isLoaded, handleSetIsLoaded }) {
   }, [handleSetIsLoaded]);
 
   // loop recursively to amimateMeters
-  const animateMeter = () => {
+  const animateMeter = useCallback(() => {
     meters.current.forEach((meter, i) => {
       meterVals[i] = meter.getValue() + 85;
       setMeterVals(() => [...meterVals]);
     });
     requestRef.current = requestAnimationFrame(animateMeter);
-  };
+  }, [meterVals]);
 
   // triggers animateMeter
   useEffect(() => {
     requestAnimationFrame(animateMeter);
     return () => cancelAnimationFrame(requestRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+  }, [playState]);
 
   // when busOneFxOneChoice is selected it initiates new FX
   choices.current = [
@@ -154,6 +152,8 @@ function Mixer({ song, isLoaded, handleSetIsLoaded }) {
       switch (choice) {
         case "bs1-fx1":
         case "bs1-fx2":
+        case "bs2-fx1":
+        case "bs2-fx2":
           break;
         case "reverb":
           i === 1 && setBusOneFxOneType(new Reverb({ wet: 1 }).toDestination());
@@ -500,7 +500,7 @@ function Mixer({ song, isLoaded, handleSetIsLoaded }) {
               eq={eqs.current[i]}
               track={track}
               tracks={tracks}
-              state={state}
+              playState={playState}
               toggleBusOne={toggleBusOne}
               toggleBusTwo={toggleBusTwo}
               busOneActive={busOneActive}
@@ -509,7 +509,7 @@ function Mixer({ song, isLoaded, handleSetIsLoaded }) {
           );
         })}
         <Bus1
-          state={state}
+          playState={playState}
           busOneActive={busOneActive}
           busOneChannel={busOneChannel.current}
           handleSetBusOneFxOneChoice={handleSetBusOneFxOneChoice}
@@ -517,25 +517,22 @@ function Mixer({ song, isLoaded, handleSetIsLoaded }) {
           busOneMeter={busOneMeter.current}
         />
         <Bus2
-          state={state}
+          playState={playState}
           busTwoActive={busTwoActive}
           busTwoChannel={busTwoChannel.current}
           handleSetBusTwoFxOneChoice={handleSetBusTwoFxOneChoice}
           handleSetBusTwoFxTwoChoice={handleSetBusTwoFxTwoChoice}
           busTwoMeter={busTwoMeter.current}
         />
-        <MasterVol
-          state={state}
-          masterMeter={masterMeter.current}
-          // masterBusChannel={masterBusChannel.current}
-        />
-        {/* <div className="multi-meter">
-          <MultiMeter state={state} />
-        </div> */}
+        <MasterVol playState={playState} masterMeter={masterMeter.current} />
       </div>
       <div className="controls-wrap">
         <div className="controls-well">
-          <Controls song={song} state={state} handleSetState={handleSetState} />
+          <Controls
+            song={song}
+            playState={playState}
+            handleSetState={handleSetState}
+          />
         </div>
       </div>
     </div>

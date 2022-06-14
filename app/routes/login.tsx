@@ -61,7 +61,7 @@ export let action: ActionFunction = async ({
           formError: `Username/Password combination is incorrect`,
         };
       }
-      return createUserSession(user.id, "/");
+      return createUserSession(user.id, `/mixer/${user.id}`);
     }
     case "register": {
       let userExists = await db.user.findFirst({ where: { username } });
@@ -78,7 +78,7 @@ export let action: ActionFunction = async ({
           formError: `Something went wrong trying to create a new user.`,
         };
       }
-      return createUserSession(user.id, "/");
+      return createUserSession(user.id, `/mixer/${user.id}`);
     }
     default: {
       return { fields, formError: `Login type invalid` };
@@ -173,14 +173,14 @@ export default function Login() {
               </p>
             ) : null}
           </div>
-          <button type="submit" className="button">
-            Submit
-          </button>
+          <button type="submit">Submit</button>
         </Form>
       </div>
       <br />
       <div>
-        <Link to="/">Back home</Link>
+        <Link style={{ color: "white" }} to="/mixer">
+          Go To Mixer
+        </Link>
       </div>
     </div>
   );
