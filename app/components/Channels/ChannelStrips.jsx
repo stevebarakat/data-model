@@ -26,8 +26,6 @@ function ChannelStrip({
   const [midEqLevel, setMidEqLevel] = useState(track.midEqLevel);
   const [lowEqLevel, setLowEqLevel] = useState(track.lowEqLevel);
 
-  console.log("hello");
-
   // THIS IS WHERE THE LOGARITHMIC SCALE IS SET
   function changeVolume(e) {
     if (isMuted) return;
