@@ -27,6 +27,9 @@ export default function Index() {
           <form action="/logout" method="post">
             <button type="submit">Logout</button>
           </form>
+          <Link style={{ color: "white" }} to="/mixer">
+            Mixer
+          </Link>
         </div>
       ) : (
         <div style={{ fontSize: "2rem", display: "flex", gap: "16px" }}>

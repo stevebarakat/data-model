@@ -25,6 +25,16 @@ function validatePassword(password: unknown) {
   }
 }
 
+// export async function action({ request }) {
+//   const user = await validateUser(request);
+//   const songMix = await getLastSongMixByUser(user.id);
+//   if (songMix) {
+//     return redirect(`/mixer/${songMix.id}`);
+//   } else {
+//     return redirect("/mixer");
+//   }
+// }
+
 type ActionData = {
   formError?: string;
   fieldErrors?: { username: string | undefined; password: string | undefined };
@@ -61,7 +71,7 @@ export let action: ActionFunction = async ({
           formError: `Username/Password combination is incorrect`,
         };
       }
-      return createUserSession(user.id, `/mixer/${user.id}`);
+      return createUserSession(user.id, `/${songMix.id}`);
     }
     case "register": {
       let userExists = await db.user.findFirst({ where: { username } });
@@ -78,7 +88,7 @@ export let action: ActionFunction = async ({
           formError: `Something went wrong trying to create a new user.`,
         };
       }
-      return createUserSession(user.id, `/mixer/${user.id}`);
+      return createUserSession(user.id, `/${songMix}`);
     }
     default: {
       return { fields, formError: `Login type invalid` };
