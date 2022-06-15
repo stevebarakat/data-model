@@ -88,7 +88,7 @@ export let action: ActionFunction = async ({
           formError: `Something went wrong trying to create a new user.`,
         };
       }
-      return createUserSession(user.id, `/${songMix}`);
+      return createUserSession(user.id, `/${songMix.id}`);
     }
     default: {
       return { fields, formError: `Login type invalid` };

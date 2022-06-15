@@ -1,4 +1,4 @@
-import { useLoaderData, Link, Outlet } from "@remix-run/react";
+import { useLoaderData, Link } from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 
@@ -27,9 +27,11 @@ export default function Index() {
           <form action="/logout" method="post">
             <button type="submit">Logout</button>
           </form>
-          <Link style={{ color: "white" }} to="/mixer">
-            Mixer
-          </Link>
+          <div style={{ padding: "1rem" }}>
+            <Link style={{ color: "white" }} to="/mixer">
+              Go to Mixer
+            </Link>
+          </div>
         </div>
       ) : (
         <div style={{ fontSize: "2rem", display: "flex", gap: "16px" }}>
@@ -42,7 +44,6 @@ export default function Index() {
         <img src="/remix.svg" alt="remix" width="600" />
         <p style={{ fontWeight: "bold" }}>version 0.0.0.0.1</p>
       </div>
-      <Outlet />
     </div>
   );
 }
